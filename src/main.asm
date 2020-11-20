@@ -3,11 +3,13 @@
 ;					Copyright (C) 2007, Tekepen
 ;----------------------------------------------------------------------------
 .setcpu		"65816"
-.autoimport	on
+;.include "global_variables.asm"
 
 .import	InitRegs
 
-.define gScrollX $0000
+.segment "BSS"
+scrollX:
+	.word $ffff
 
 .segment "STARTUP"
 
@@ -37,8 +39,8 @@
 .a16
 
 ; Init memory
-	lda #$00
-	sta gScrollX
+	lda #$ffff
+	sta scrollX
 
 	lda	#$01
 	sta	$212c
@@ -84,9 +86,9 @@ mainloop:
 
 	sep	#$20
 .a8
-	lda gScrollX
+	lda scrollX
 	sta $210D
-	inc gScrollX
+	inc scrollX
 
 	rep	#$20
 .a16
