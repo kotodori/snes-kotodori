@@ -3,14 +3,12 @@
 ;					Copyright (C) 2007, Tekepen
 ;----------------------------------------------------------------------------
 .setcpu		"65816"
-;.include "global_variables.asm"
 
 .import	InitRegs
 
-;.segment "BSS_LOW"
-.segment "BSS"
+.segment "BSS_LOW"
 scrollX:
-	.word $ffff
+	.word $0000
 
 .segment "STARTUP"
 
