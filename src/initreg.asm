@@ -2,8 +2,7 @@
 ;			SNES Startup Routine
 ;					Copyright (C) 2007, Tekepen
 ;----------------------------------------------------------------------------
-.setcpu		"65816"
-.autoimport	on
+.setcpu	"65816"
 
 .export	InitRegs
 
