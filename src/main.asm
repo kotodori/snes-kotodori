@@ -7,6 +7,7 @@
 
 .import	InitRegs
 
+;.segment "BSS_LOW"
 .segment "BSS"
 scrollX:
 	.word $ffff
