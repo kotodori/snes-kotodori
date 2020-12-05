@@ -103,9 +103,10 @@ mainloop:
 .endproc
 
 ; カートリッジ情報
-.segment "CARTINFO"
+.segment "TITLE"
     .byte	"KOTODORI             "	; Game Title
-    .byte	$00				; 0x01:HiRom, 0x30:FastRom(3.57MHz)
+.segment "HEADER"
+    .byte	$31				; 0x01:HiRom, 0x30:FastRom(3.57MHz)
     .byte	$00				; ROM only
     .byte	$08				; 32KB=256KBits
     .byte	$00				; RAM Size (8KByte * N)
