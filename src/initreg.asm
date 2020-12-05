@@ -99,7 +99,8 @@
     stz	$420a
     stz	$420b
     stz	$420c
-    stz	$420d
+    lda	#$01
+    sta	$420d
 
     rts
 .endproc
