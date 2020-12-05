@@ -1,0 +1,17 @@
+name: Build
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup
+        run: |
+          sudo apt update
+          sudo apt install make cc65
+
+      - name: Build
+        run: |
+          make
