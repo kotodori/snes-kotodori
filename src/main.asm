@@ -1,6 +1,6 @@
 ;----------------------------------------------------------------------------
-;			SNES Startup Routine
-;					Copyright (C) 2007, Tekepen
+;   SNES Startup Routine
+;     Copyright (C) 2007, Tekepen
 ;----------------------------------------------------------------------------
 .setcpu "65816"
 
@@ -8,90 +8,90 @@
 
 .segment "BSS_LOW"
 scrollX:
-    .word $0000
+  .word $0000
 
 .segment "RODATA"
 Palette:
-	.incbin	"palette.bin"
+  .incbin "palette.bin"
 Pattern:
-	.incbin	"moji.chr"
+  .incbin "tile.bin"
 String:
-	.asciiz	"HELLO, WORLD!"
+  .asciiz "HELLO, WORLD!"
 
 .segment "STARTUP"
-.proc	Reset
-	sei
-	clc
-	xce	; Native Mode
-	phk
-	plb	; DB = 0
+.proc Reset
+  sei
+  clc
+  xce ; Native Mode
+  phk
+  plb ; DB = 0
 
-	rep	#$30	; A,I 16bit
+  rep #$30 ; A,I 16bit
 .a16
 .i16
-	ldx	#$1fff
-	txs
+  ldx #$1fff
+  txs
 
-	jsr	InitRegs
+  jsr InitRegs
 
-	sep	#$20
+  sep #$20
 .a8
-	lda	#$40
-	sta	$2107
-	stz	$210b
+  lda #$40
+  sta $2107
+  stz $210b
 
 ; Copy Palettes
-	stz	$2121
-	ldy	#$0200
-	ldx	#$0000
+  stz $2121
+  ldy #$0200
+  ldx #$0000
 copypal:
-	lda	Palette, x
-	sta	$2122
-	inx
-	dey
-	bne	copypal
+  lda Palette, x
+  sta $2122
+  inx
+  dey
+  bne copypal
 
 ; Copy Patterns
-	rep	#$20
+  rep #$20
 .a16
-	lda	#$0000
-	sta	$2116
-	ldy	#$2000
-	ldx	#$0000
+  lda #$0000
+  sta $2116
+  ldy #$2000
+  ldx #$0000
 copyptn:
-	lda	Pattern, x
-	sta	$2118
-	inx
-	inx
-	dey
-	bne	copyptn
+  lda Pattern, x
+  sta $2118
+  inx
+  inx
+  dey
+  bne copyptn
 
 ; Copy NameTable
-	lda	#$41a9
-	sta	$2116
-	ldy	#$000d
-	ldx	#$0000
-	lda	#$0000
+  lda #$41a9
+  sta $2116
+  ldy #$000d
+  ldx #$0000
+  lda #$0000
 copyname:
-	sep	#$20
+  sep #$20
 .a8
-	lda	String, x
-	rep	#$20
+  lda String, x
+  rep #$20
 .a16
-	sta	$2118
-	inx
-	dey
-	bne	copyname
+  sta $2118
+  inx
+  dey
+  bne copyname
 
-	lda	#$01
-	sta	$212c
-	stz	$212d
-	lda	#$0f
-	sta	$2100
+  lda #$01
+  sta $212c
+  stz $212d
+  lda #$0f
+  sta $2100
 mainloop:
-	jmp	mainloop
+  jmp mainloop
 
-	rti
+  rti
 .endproc
 
 .proc VBlank
