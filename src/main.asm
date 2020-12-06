@@ -10,71 +10,88 @@
 scrollX:
     .word $0000
 
+.segment "RODATA"
+Palette:
+	.incbin	"palette.bin"
+Pattern:
+	.incbin	"moji.chr"
+String:
+	.asciiz	"HELLO, WORLD!"
+
 .segment "STARTUP"
+.proc	Reset
+	sei
+	clc
+	xce	; Native Mode
+	phk
+	plb	; DB = 0
 
-; リセット割り込み
-.proc Reset
-    sei
-    clc
-    xce ; Native Mode
-    phk
-    plb ; DB = 0
-
-    rep #$30 ; A,I 16bit
+	rep	#$30	; A,I 16bit
 .a16
 .i16
-    ldx #$1fff
-    txs
-    
-    jsr InitRegs
+	ldx	#$1fff
+	txs
 
-    sep #$20
+	jsr	InitRegs
+
+	sep	#$20
 .a8
-    lda #$40
-    sta $2107
-    stz $210b
+	lda	#$40
+	sta	$2107
+	stz	$210b
 
-    rep #$20
+; Copy Palettes
+	stz	$2121
+	ldy	#$0200
+	ldx	#$0000
+copypal:
+	lda	Palette, x
+	sta	$2122
+	inx
+	dey
+	bne	copypal
+
+; Copy Patterns
+	rep	#$20
 .a16
+	lda	#$0000
+	sta	$2116
+	ldy	#$2000
+	ldx	#$0000
+copyptn:
+	lda	Pattern, x
+	sta	$2118
+	inx
+	inx
+	dey
+	bne	copyptn
 
-; Init memory
-    lda #$ffff
-    sta scrollX
+; Copy NameTable
+	lda	#$41a9
+	sta	$2116
+	ldy	#$000d
+	ldx	#$0000
+	lda	#$0000
+copyname:
+	sep	#$20
+.a8
+	lda	String, x
+	rep	#$20
+.a16
+	sta	$2118
+	inx
+	dey
+	bne	copyname
 
-    lda #$01
-    sta $212c
-    stz $212d
-    lda #$0f
-    sta $2100
-
-    jsr initSystemStates
-
+	lda	#$01
+	sta	$212c
+	stz	$212d
+	lda	#$0f
+	sta	$2100
 mainloop:
-    jmp mainloop
+	jmp	mainloop
 
-    rti
-.endproc
-
-
-; == Sub
-; MUST UNDER: A16, I16
-.proc initSystemStates
-    pha
-
-    ; VSync and Joypad
-    sep #$20
-.a8
-
-    stz $4016
-
-    lda #$81
-    sta $4200
-
-    rep #$20
-.a16
-
-    pla
-    rts
+	rti
 .endproc
 
 .proc VBlank
