@@ -125,7 +125,7 @@ mainloop:
 .segment "HEADER"
   .byte $31                   ; 0x01:HiRom, 0x30:FastRom(3.57MHz)
   .byte $00                   ; ROM only
-  .byte $08                   ; 32KB=256KBits
+  .byte $0c                   ; 32KB=256KBits
   .byte $00                   ; RAM Size (8KByte * N)
   .byte $00                   ; NTSC
   .byte $01                   ; Licensee
@@ -133,19 +133,19 @@ mainloop:
   .byte $9a, $46, $65, $b9    ; checksum(empty here)
   .byte $ff, $ff, $ff, $ff    ; unknown
 
-  .word EmptyInt              ; Native:COP
-  .word EmptyInt              ; Native:BRK
-  .word EmptyInt              ; Native:ABORT
-  .word VBlank                ; Native:NMI
+  .word .loword(EmptyInt)              ; Native:COP
+  .word .loword(EmptyInt)              ; Native:BRK
+  .word .loword(EmptyInt)              ; Native:ABORT
+  .word .loword(VBlank)                ; Native:NMI
   .word $0000                 ;
-  .word EmptyInt              ; Native:IRQ
+  .word .loword(EmptyInt)              ; Native:IRQ
 
   .word $0000
   .word $0000
 
-  .word EmptyInt              ; Emulation:COP
-  .word EmptyInt              ;
-  .word EmptyInt              ; Emulation:ABORT
-  .word VBlank                ; Emulation:NMI
-  .word Reset                 ; Emulation:RESET
-  .word EmptyInt              ; Emulation:IRQ/BRK
+  .word .loword(EmptyInt)              ; Emulation:COP
+  .word .loword(EmptyInt)              ;
+  .word .loword(EmptyInt)              ; Emulation:ABORT
+  .word .loword(VBlank)                ; Emulation:NMI
+  .word .loword(Reset)                 ; Emulation:RESET
+  .word .loword(EmptyInt)              ; Emulation:IRQ/BRK
