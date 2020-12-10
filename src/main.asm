@@ -6,9 +6,9 @@
 
 .import InitRegs
 
-.segment "BSS_LOW"
-scrollX:
-  .word $0000
+; .segment "BSS_LOW"
+; scrollX:
+;   .word $0000
 
 .segment "RODATA"
 Palette:
@@ -41,32 +41,73 @@ String:
   stz $210b
 
 ; Copy Palettes
+  phb
+
   stz $2121
   ldy #$0200
   ldx #$0000
+
+  lda #$00
+  pha
+
 copypal:
+  lda #^Palette
+  pha
+  plb
+
   lda Palette, x
+  plb
   sta $2122
+  lda #$00
+  pha
+
   inx
   dey
   bne copypal
+  plb
 
 ; Copy Patterns
+  lda #$00
+  pha
+  plb
+
   rep #$20
 .a16
   lda #$0000
   sta $2116
   ldy #$2000
   ldx #$0000
+
+  lda #$00
+  pha
+
 copyptn:
+  lda #^Pattern
+  pha
+  plb
+
   lda Pattern, x
+
+  plb
+  plb
+  plb
+
   sta $2118
+
+  lda #$00
+  pha
+
   inx
   inx
   dey
   bne copyptn
+  plb
+
 
 ; Copy NameTable
+  lda #$00
+  pha
+
   lda #$41a9
   sta $2116
   ldy #$000d
@@ -75,13 +116,29 @@ copyptn:
 copyname:
   sep #$20
 .a8
+  lda #^String
+  pha
+  plb
+
   lda String, x
+  inc
+
+  plb
+
   rep #$20
 .a16
   sta $2118
+
+  lda #$00
+  pha
+  plb
+
   inx
   dey
   bne copyname
+
+  plb
+
 
   lda #$01
   sta $212c
@@ -102,9 +159,9 @@ mainloop:
 
   sep #$20
 .a8
-  lda scrollX
-  sta $210D
-  inc scrollX
+  ; lda scrollX
+  ; sta $210D
+  ; inc scrollX
 
   rep #$20
 .a16
@@ -130,7 +187,8 @@ mainloop:
   .byte $00                   ; NTSC
   .byte $01                   ; Licensee
   .byte $00                   ; Version
-  .byte $9a, $46, $65, $b9    ; checksum(empty here)
+	.word   $CDCD
+	.word   $3232
   .byte $ff, $ff, $ff, $ff    ; unknown
 
   .word .loword(EmptyInt)              ; Native:COP
