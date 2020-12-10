@@ -121,7 +121,6 @@ copyname:
   plb
 
   lda String, x
-  inc
 
   plb
 
