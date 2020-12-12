@@ -186,8 +186,8 @@ mainloop:
   .byte $00                     ; NTSC
   .byte $01                     ; Licensee
   .byte $00                     ; Version
-  .word   $CDCD
-  .word   $3232
+  .word $CDCD
+  .word $3232
   .byte $ff, $ff, $ff, $ff      ; unknown
 
   .word .loword(EmptyInt)       ; Native:COP
