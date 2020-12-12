@@ -6,10 +6,6 @@
 
 .import InitRegs
 
-; .segment "BSS_LOW"
-; scrollX:
-;   .word $0000
-
 .segment "RODATA"
 Palette:
   .incbin "palette.bin"
@@ -144,6 +140,18 @@ copyname:
   stz $212d
   lda #$0f
   sta $2100
+
+  sep #$20
+.a8
+
+  ; Enable NMI
+  lda #$81
+  sta $4200
+
+  rep #$20
+.a16
+
+
 mainloop:
   jmp mainloop
 
@@ -155,15 +163,7 @@ mainloop:
   phx
   php
 
-
-  sep #$20
-.a8
-  ; lda scrollX
-  ; sta $210D
-  ; inc scrollX
-
-  rep #$20
-.a16
+  ; Do nothing
 
   plp
   plx
@@ -179,30 +179,30 @@ mainloop:
 .segment "TITLE"
   .byte "KOTODORI             " ; Game Title
 .segment "HEADER"
-  .byte $31                   ; 0x01:HiRom, 0x30:FastRom(3.57MHz)
-  .byte $00                   ; ROM only
-  .byte $0c                   ; 32KB=256KBits
-  .byte $00                   ; RAM Size (8KByte * N)
-  .byte $00                   ; NTSC
-  .byte $01                   ; Licensee
-  .byte $00                   ; Version
-	.word   $CDCD
-	.word   $3232
-  .byte $ff, $ff, $ff, $ff    ; unknown
+  .byte $31                     ; 0x01:HiRom, 0x30:FastRom(3.57MHz)
+  .byte $00                     ; ROM only
+  .byte $0c                     ; 32KB=256KBits
+  .byte $00                     ; RAM Size (8KByte * N)
+  .byte $00                     ; NTSC
+  .byte $01                     ; Licensee
+  .byte $00                     ; Version
+  .word   $CDCD
+  .word   $3232
+  .byte $ff, $ff, $ff, $ff      ; unknown
 
-  .word .loword(EmptyInt)              ; Native:COP
-  .word .loword(EmptyInt)              ; Native:BRK
-  .word .loword(EmptyInt)              ; Native:ABORT
-  .word .loword(VBlank)                ; Native:NMI
-  .word $0000                 ;
-  .word .loword(EmptyInt)              ; Native:IRQ
+  .word .loword(EmptyInt)       ; Native:COP
+  .word .loword(EmptyInt)       ; Native:BRK
+  .word .loword(EmptyInt)       ; Native:ABORT
+  .word .loword(VBlank)         ; Native:NMI
+  .word $0000
+  .word .loword(EmptyInt)       ; Native:IRQ
 
   .word $0000
   .word $0000
 
-  .word .loword(EmptyInt)              ; Emulation:COP
-  .word .loword(EmptyInt)              ;
-  .word .loword(EmptyInt)              ; Emulation:ABORT
-  .word .loword(VBlank)                ; Emulation:NMI
-  .word .loword(Reset)                 ; Emulation:RESET
-  .word .loword(EmptyInt)              ; Emulation:IRQ/BRK
+  .word .loword(EmptyInt)       ; Emulation:COP
+  .word .loword(EmptyInt)
+  .word .loword(EmptyInt)       ; Emulation:ABORT
+  .word .loword(VBlank)         ; Emulation:NMI
+  .word .loword(Reset)          ; Emulation:RESET
+  .word .loword(EmptyInt)       ; Emulation:IRQ/BRK
