@@ -1,134 +1,208 @@
 ;----------------------------------------------------------------------------
-;			SNES Startup Routine
-;					Copyright (C) 2007, Tekepen
+;   SNES Startup Routine
+;     Copyright (C) 2007, Tekepen
 ;----------------------------------------------------------------------------
 .setcpu "65816"
 
 .import InitRegs
 
-.segment "BSS_LOW"
-scrollX:
-    .word $0000
+.segment "RODATA"
+Palette:
+  .incbin "palette.bin"
+Pattern:
+  .incbin "tile.bin"
+String:
+  .asciiz "HELLO, WORLD!"
 
 .segment "STARTUP"
-
-; リセット割り込み
 .proc Reset
-    sei
-    clc
-    xce ; Native Mode
-    phk
-    plb ; DB = 0
+  sei
+  clc
+  xce ; Native Mode
+  phk
+  plb ; DB = 0
 
-    rep #$30 ; A,I 16bit
+  rep #$30 ; A,I 16bit
 .a16
 .i16
-    ldx #$1fff
-    txs
-    
-    jsr InitRegs
+  ldx #$1fff
+  txs
 
-    sep #$20
+  jsr InitRegs
+
+  sep #$20
 .a8
-    lda #$40
-    sta $2107
-    stz $210b
+  lda #$40
+  sta $2107
+  stz $210b
 
-    rep #$20
+; Copy Palettes
+  phb
+
+  stz $2121
+  ldy #$0200
+  ldx #$0000
+
+  lda #$00
+  pha
+
+copypal:
+  lda #^Palette
+  pha
+  plb
+
+  lda Palette, x
+  plb
+  sta $2122
+  lda #$00
+  pha
+
+  inx
+  dey
+  bne copypal
+  plb
+
+; Copy Patterns
+  lda #$00
+  pha
+  plb
+
+  rep #$20
+.a16
+  lda #$0000
+  sta $2116
+  ldy #$2000
+  ldx #$0000
+
+  lda #$00
+  pha
+
+copyptn:
+  lda #^Pattern
+  pha
+  plb
+
+  lda Pattern, x
+
+  plb
+  plb
+  plb
+
+  sta $2118
+
+  lda #$00
+  pha
+
+  inx
+  inx
+  dey
+  bne copyptn
+  plb
+
+
+; Copy NameTable
+  lda #$00
+  pha
+
+  lda #$41a9
+  sta $2116
+  ldy #$000d
+  ldx #$0000
+  lda #$0000
+copyname:
+  sep #$20
+.a8
+  lda #^String
+  pha
+  plb
+
+  lda String, x
+
+  plb
+
+  rep #$20
+.a16
+  sta $2118
+
+  lda #$00
+  pha
+  plb
+
+  inx
+  dey
+  bne copyname
+
+  plb
+
+
+  lda #$01
+  sta $212c
+  stz $212d
+  lda #$0f
+  sta $2100
+
+  sep #$20
+.a8
+
+  ; Enable NMI
+  lda #$81
+  sta $4200
+
+  rep #$20
 .a16
 
-; Init memory
-    lda #$ffff
-    sta scrollX
-
-    lda #$01
-    sta $212c
-    stz $212d
-    lda #$0f
-    sta $2100
-
-    jsr initSystemStates
 
 mainloop:
-    jmp mainloop
+  jmp mainloop
 
-    rti
-.endproc
-
-
-; == Sub
-; MUST UNDER: A16, I16
-.proc initSystemStates
-    pha
-
-    ; VSync and Joypad
-    sep #$20
-.a8
-
-    stz $4016
-
-    lda #$81
-    sta $4200
-
-    rep #$20
-.a16
-
-    pla
-    rts
+  rti
 .endproc
 
 .proc VBlank
-    pha
-    phx
-    php
+  pha
+  phx
+  php
 
+  ; Do nothing
 
-    sep #$20
-.a8
-    lda scrollX
-    sta $210D
-    inc scrollX
-
-    rep #$20
-.a16
-
-    plp
-    plx
-    pla
-    rti
+  plp
+  plx
+  pla
+  rti
 .endproc
 
 .proc EmptyInt
-    rti
+  rti
 .endproc
 
 ; カートリッジ情報
 .segment "TITLE"
-    .byte "KOTODORI             " ; Game Title
+  .byte "KOTODORI             " ; Game Title
 .segment "HEADER"
-    .byte $31                   ; 0x01:HiRom, 0x30:FastRom(3.57MHz)
-    .byte $00                   ; ROM only
-    .byte $08                   ; 32KB=256KBits
-    .byte $00                   ; RAM Size (8KByte * N)
-    .byte $00                   ; NTSC
-    .byte $01                   ; Licensee
-    .byte $00                   ; Version
-    .byte $9a, $46, $65, $b9    ; checksum(empty here)
-    .byte $ff, $ff, $ff, $ff    ; unknown
+  .byte $31                     ; 0x01:HiRom, 0x30:FastRom(3.57MHz)
+  .byte $00                     ; ROM only
+  .byte $0c                     ; 32KB=256KBits
+  .byte $00                     ; RAM Size (8KByte * N)
+  .byte $00                     ; NTSC
+  .byte $01                     ; Licensee
+  .byte $00                     ; Version
+  .word $CDCD
+  .word $3232
+  .byte $ff, $ff, $ff, $ff      ; unknown
 
-    .word EmptyInt              ; Native:COP
-    .word EmptyInt              ; Native:BRK
-    .word EmptyInt              ; Native:ABORT
-    .word VBlank                ; Native:NMI
-    .word $0000                 ;
-    .word EmptyInt              ; Native:IRQ
+  .word .loword(EmptyInt)       ; Native:COP
+  .word .loword(EmptyInt)       ; Native:BRK
+  .word .loword(EmptyInt)       ; Native:ABORT
+  .word .loword(VBlank)         ; Native:NMI
+  .word $0000
+  .word .loword(EmptyInt)       ; Native:IRQ
 
-    .word $0000
-    .word $0000
+  .word $0000
+  .word $0000
 
-    .word EmptyInt              ; Emulation:COP
-    .word EmptyInt              ;
-    .word EmptyInt              ; Emulation:ABORT
-    .word VBlank                ; Emulation:NMI
-    .word Reset                 ; Emulation:RESET
-    .word EmptyInt              ; Emulation:IRQ/BRK
+  .word .loword(EmptyInt)       ; Emulation:COP
+  .word .loword(EmptyInt)
+  .word .loword(EmptyInt)       ; Emulation:ABORT
+  .word .loword(VBlank)         ; Emulation:NMI
+  .word .loword(Reset)          ; Emulation:RESET
+  .word .loword(EmptyInt)       ; Emulation:IRQ/BRK

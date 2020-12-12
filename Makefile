@@ -8,7 +8,7 @@ OUT_DIR := build
 
 TARGET := $(OUT_DIR)/$(ROM_NAME)
 SOURCES := $(shell find $(SOURCE_DIR) -name "*.asm")
-OBJECTS	:= $(addprefix $(OUT_DIR)/,$(patsubst %.asm,%.o,$(SOURCES)))
+OBJECTS := $(addprefix $(OUT_DIR)/,$(patsubst %.asm,%.o,$(SOURCES)))
 
 .PHONY: all clean
 all: $(TARGET)
