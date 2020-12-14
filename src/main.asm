@@ -12,7 +12,12 @@ Palette:
 Pattern:
   .incbin "tile.bin"
 String:
-  .asciiz "HELLO, WORLD!"
+  .asciiz "M e m o r y   v i e w e r "
+Instruction:
+  .asciiz "Specify memory address"
+
+.include "resource_macros.inc"
+.include "ppu.asm"
 
 .segment "STARTUP"
 .proc Reset
@@ -62,78 +67,12 @@ copypal:
   bne copypal
   plb
 
-; Copy Patterns
-  lda #$00
-  pha
-  plb
-
   rep #$20
 .a16
-  lda #$0000
-  sta $2116
-  ldy #$2000
-  ldx #$0000
 
-  lda #$00
-  pha
+  loadWithAssetAddress String, #$4000, #$001b
 
-copyptn:
-  lda #^Pattern
-  pha
-  plb
-
-  lda Pattern, x
-
-  plb
-  plb
-  plb
-
-  sta $2118
-
-  lda #$00
-  pha
-
-  inx
-  inx
-  dey
-  bne copyptn
-  plb
-
-
-; Copy NameTable
-  lda #$00
-  pha
-
-  lda #$41a9
-  sta $2116
-  ldy #$000d
-  ldx #$0000
-  lda #$0000
-copyname:
-  sep #$20
-.a8
-  lda #^String
-  pha
-  plb
-
-  lda String, x
-
-  plb
-
-  rep #$20
-.a16
-  sta $2118
-
-  lda #$00
-  pha
-  plb
-
-  inx
-  dey
-  bne copyname
-
-  plb
-
+  loadWithAssetAddress Pattern, #$0000, #$8000
 
   lda #$01
   sta $212c
@@ -141,12 +80,7 @@ copyname:
   lda #$0f
   sta $2100
 
-  sep #$20
-.a8
-
-  ; Enable NMI
-  lda #$81
-  sta $4200
+  jsr enableNMI
 
   rep #$20
 .a16
