@@ -148,7 +148,7 @@ copyname:
 .a8
 
   ; Enable NMI
-  lda #$81
+  lda #$80
   sta $4200
 
   rep #$20
