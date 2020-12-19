@@ -4,6 +4,8 @@
 ;----------------------------------------------------------------------------
 .setcpu "65816"
 
+.include "common.inc"
+
 .import InitRegs
 
 .segment "RODATA"
