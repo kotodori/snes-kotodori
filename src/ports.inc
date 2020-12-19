@@ -1,27 +1,4 @@
-.define pSpriteConf  $2101
-.define pOAMWAddress $2102
-.define pOAMWrite    $2104
-
-.define pBGMosaic    $2106
-
-.define pScrollX0     $210D
-.define pScrollY0     $210E
-.define pScrollX1     $210F
-.define pScrollY1     $2110
-.define pScrollY2     $2112
-
-.define pVWriteAddrW  $2116
-.define pVWriteValW   $2118
-
-.define pM7FillConfig $211A
-
-.define pCGRAMAddr    $2121
-.define pCGRAMWrite   $2122
-.define pCGRAMRead    $213B
-
-.define pScrsEnabled  $212c
-
-.define pDMATrigger        $420b
+.define pDMATrigger        $420B
 .define pHDMATrigger       $420C
 
 .define pDMA0Config        $4300
@@ -48,13 +25,11 @@
 .define pDMA3SourceBank    $4334
 .define pDMA3ByteCountW    $4335
 
-
 .define pDMA4Config        $4340
 .define pDMA4Dest          $4341
 .define pDMA4SourceOffsetW $4342
 .define pDMA4SourceBank    $4344
 .define pDMA4ByteCountW    $4345
-
 
 .define pDMA5Config        $4350
 .define pDMA5Dest          $4351
@@ -73,14 +48,3 @@
 .define pDMA7SourceOffsetW $4372
 .define pDMA7SourceBank    $4374
 .define pDMA7ByteCountW    $4375
-
-
-; Multiply / Divide
-.define pMulc_inA          $4202
-.define pMulc_inB          $4203
-.define pMulc_out          $4216
-
-.define pDivc_dividend     $4204
-.define pDivc_divisor      $4206
-.define pDivc_outQ         $4214
-.define pDivc_outM         $4216
