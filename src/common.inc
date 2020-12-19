@@ -1,5 +1,5 @@
 .macro function __name
-.proc __name
+  .proc __name
     pha
     phx
     phy
