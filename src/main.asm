@@ -4,8 +4,6 @@
 ;----------------------------------------------------------------------------
 .setcpu "65816"
 
-.include "common.inc"
-
 .import InitRegs
 
 .segment "RODATA"
@@ -14,11 +12,16 @@ Palette:
 Pattern:
   .incbin "tile.bin"
 String:
-  .asciiz "M e m o r y   v i e w e r "
-Instruction:
-  .asciiz "Specify memory address"
+  .word $004b
+  .word $006f
+  .word $0074
+  .word $006f
+  .word $0064
+  .word $006f
+  .word $0072
+  .word $0069
 
-.include "resource_macros.inc"
+.include "resource.inc"
 .include "ppu.asm"
 
 .segment "STARTUP"
@@ -69,11 +72,7 @@ copypal:
   bne copypal
   plb
 
-  rep #$20
-.a16
-
   loadWithAssetAddress String, #$4000, #$001b
-
   loadWithAssetAddress Pattern, #$0000, #$8000
 
   lda #$01
