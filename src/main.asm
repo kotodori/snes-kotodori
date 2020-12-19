@@ -7,12 +7,13 @@
 .include "common.inc"
 
 .import InitRegs
+.import printControllerInput
+.import readControllerInputs
+
+.import Palette
+.import Pattern
 
 .segment "RODATA"
-Palette:
-  .incbin "palette.bin"
-Pattern:
-  .incbin "tile.bin"
 String:
   .asciiz "HELLO, WORLD!"
 
@@ -165,7 +166,8 @@ mainloop:
   phx
   php
 
-  ; Do nothing
+  jsr printControllerInput
+  jsr readControllerInputs
 
   plp
   plx

@@ -5,6 +5,7 @@
     phy
     php
     phd
+    phb
     tsc
     tcd
 .endmacro
@@ -12,6 +13,7 @@
 .macro endFunction
     tdc
     tcs
+    plb
     pld
     plp
     ply
