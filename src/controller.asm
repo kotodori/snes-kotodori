@@ -6,13 +6,16 @@
 
 .segment "STARTUP"
 
-.macro renderWord addr
+.macro renderWord addr, vRamAddr
   .define ascii0 $0030
   .define ascii1 $0031
   .local ascii0
   .local ascii1
   .local loop
   .local store
+
+  lda vRamAddr
+  sta rVRamAddress
 
   ldy #$0010
   loop:
@@ -53,15 +56,8 @@ function printControllerInputs
   pha
   pld
 
-  lda #$41a9
-  sta rVRamAddress
-
-  renderWord buffer1
-
-  lda #$41e9
-  sta rVRamAddress
-
-  renderWord buffer2
+  renderWord buffer1, #$41a9
+  renderWord buffer2, #$41e9
 
   pld
 endFunction
