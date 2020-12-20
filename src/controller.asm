@@ -30,8 +30,8 @@
     bne loop
 .endmacro
 
-.export printControllerInput
-function printControllerInput
+.export printControllerInputs
+function printControllerInputs
   rep #$30
   .a16
   .i16

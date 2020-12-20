@@ -7,7 +7,7 @@
 .include "common.inc"
 
 .import InitRegs
-.import printControllerInput
+.import printControllerInputs
 .import readControllerInputs
 
 .segment "RODATA"
@@ -167,7 +167,7 @@ mainloop:
   phx
   php
 
-  jsr printControllerInput
+  jsr printControllerInputs
   jsr readControllerInputs
 
   plp
