@@ -6,24 +6,6 @@
 
 .segment "STARTUP"
 
-; NMI 有効化(自動パッド読み取り有効)
-.proc enableNMI
-.a16
-.i16
-	pha
-
-  sep #$20
-	.a8
-		lda #$81
-		sta $4200
-	rep #$20
-	.a16
-
-	pla
-	rts
-.endproc
-
-
 ; VRAMデータDMA転送
 .proc transferBitmapDataDMA
 .a16

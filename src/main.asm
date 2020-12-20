@@ -5,6 +5,8 @@
 .setcpu "65816"
 
 .import InitRegs
+.import printControllerInputs
+.import readControllerInputs
 
 .segment "RODATA"
 Palette:
@@ -81,7 +83,12 @@ copypal:
   lda #$0f
   sta $2100
 
-  jsr enableNMI
+  sep #$20
+.a8
+
+  ; Enable NMI
+  lda #$80
+  sta $4200
 
   rep #$20
 .a16
@@ -98,7 +105,8 @@ mainloop:
   phx
   php
 
-  ; Do nothing
+  jsr printControllerInputs
+  jsr readControllerInputs
 
   plp
   plx
