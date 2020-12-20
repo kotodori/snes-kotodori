@@ -6,6 +6,30 @@
 
 .segment "STARTUP"
 
+.macro renderWord addr
+  .define ascii0 $0030
+  .define ascii1 $0031
+  .local ascii0
+  .local ascii1
+  .local loop
+  .local store
+
+  ldy #$0010
+  loop:
+    lda #ascii0
+
+    asl addr, x
+    bcc store
+
+    lda #ascii1
+
+    store:
+    sta rVRamDataWrite
+
+    dey
+    bne loop
+.endmacro
+
 .export printControllerInput
 function printControllerInput
   rep #$30
@@ -29,47 +53,15 @@ function printControllerInput
   pha
   pld
 
-  .define ascii0 $0030
-  .define ascii1 $0031
-
-
   lda #$41a9
   sta rVRamAddress
 
-  ldy #$0010
-  loop1:
-    lda #ascii0
-
-    asl buffer1, x
-    bcc store1
-
-    lda #ascii1
-
-    store1:
-    sta rVRamDataWrite
-
-    dey
-    bne loop1
-
+  renderWord buffer1
 
   lda #$41e9
   sta rVRamAddress
 
-  ldy #$0010
-  loop2:
-    lda #ascii0
-
-    asl buffer2, x
-    bcc store2
-
-    lda #ascii1
-
-    store2:
-    sta rVRamDataWrite
-
-    dey
-    bne loop2
-
+  renderWord buffer2
 
   pld
 endFunction
