@@ -7,6 +7,8 @@
 .include "common.inc"
 
 .import InitRegs
+.import printControllerInputs
+.import readControllerInputs
 
 .segment "RODATA"
 Palette:
@@ -147,7 +149,7 @@ copyname:
 .a8
 
   ; Enable NMI
-  lda #$81
+  lda #$80
   sta $4200
 
   rep #$20
@@ -165,7 +167,8 @@ mainloop:
   phx
   php
 
-  ; Do nothing
+  jsr printControllerInputs
+  jsr readControllerInputs
 
   plp
   plx
