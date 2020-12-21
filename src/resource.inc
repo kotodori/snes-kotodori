@@ -7,15 +7,15 @@
     phx
     ldx #.LOWORD(assetLabel)
     phx
-
     ldx destAddressWord
     phx
     ldx bytesNum
     phx
+
     jsr transferBitmapDataDMA
 
     tsc
-    adc #$0008
+    adc #$0007
     tcs
   plx
 .endmacro

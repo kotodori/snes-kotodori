@@ -1,7 +1,6 @@
 .setcpu "65816"
 
 .include "registers.inc"
-.include "global_variables.inc"
 .include "common.inc"
 
 .segment "STARTUP"
@@ -13,14 +12,14 @@
   function transfer
 
   ; Asset address(Bank)
-  lda 12 + 6
+  lda 13 + 6
   ; Asset address(Offset)
-  ldy 12 + 4
+  ldy 13 + 4
 	; Dest VRAM address
-  ldx 12 + 2
+  ldx 13 + 2
 	stx $2116
   ; Set length(bytes)
-  ldx 12 + 0
+  ldx 13 + 0
 	stx rDMA0ByteCountW
 
 	sep #$20

@@ -13,15 +13,6 @@ Palette:
   .incbin "palette.bin"
 Pattern:
   .incbin "tile.bin"
-String:
-  .word $004b
-  .word $006f
-  .word $0074
-  .word $006f
-  .word $0064
-  .word $006f
-  .word $0072
-  .word $0069
 
 .include "resource.inc"
 .include "ppu.asm"
@@ -73,9 +64,9 @@ copypal:
   dey
   bne copypal
   plb
+  plb
 
-  loadWithAssetAddress String, #$4000, #$001b
-  loadWithAssetAddress Pattern, #$0000, #$8000
+  loadWithAssetAddress Pattern, #$0000, #$4000
 
   lda #$01
   sta $212c
