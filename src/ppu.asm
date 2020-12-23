@@ -7,8 +7,10 @@
 
 ; VRAMデータDMA転送
 .proc transferBitmapDataDMA
+  rep #$30
 .a16
 .i16
+
   function transfer
 
   ; Asset address(Bank)

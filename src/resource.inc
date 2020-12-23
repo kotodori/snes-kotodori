@@ -1,6 +1,7 @@
 .macro loadWithAssetAddress assetLabel, destAddressWord, bytesNum
-  rep #$20
+  rep #$30
 .a16
+.i16
 
   phx
     ldx #.HIWORD(assetLabel)

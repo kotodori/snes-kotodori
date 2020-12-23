@@ -35,6 +35,7 @@ Pattern:
 
   sep #$20
 .a8
+
   lda #$40
   sta $2107
   stz $210b
