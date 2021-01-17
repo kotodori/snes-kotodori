@@ -6,7 +6,7 @@
 .segment "STARTUP"
 
 ; VRAMデータDMA転送
-.proc transferBitmapDataDMA
+.proc transferGraphicsDataWithDMA
   rep #$30
 .a16
 .i16

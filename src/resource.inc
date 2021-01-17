@@ -13,7 +13,7 @@
     ldx bytesNum
     phx
 
-    jsr transferBitmapDataDMA
+    jsr transferGraphicsDataWithDMA
 
     tsc
     adc #$0007
