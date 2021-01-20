@@ -1,3 +1,5 @@
+.import transferGraphicsDataWithDMA
+
 .macro loadWithAssetAddress assetLabel, destAddressWord, bytesNum
   rep #$30
 .a16

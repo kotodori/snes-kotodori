@@ -6,13 +6,8 @@
 .segment "STARTUP"
 
 ; VRAMデータDMA転送
-.proc transferGraphicsDataWithDMA
-  rep #$30
-.a16
-.i16
-
-  function transfer
-
+.export transferGraphicsDataWithDMA
+function transferGraphicsDataWithDMA
   ; Asset address(Bank)
   lda 13 + 6
   ; Asset address(Offset)
@@ -44,5 +39,4 @@
 	rep #$20
 .a16
 
-  endFunction
-.endproc
+endFunction

@@ -15,7 +15,6 @@ Pattern:
   .incbin "tile.bin"
 
 .include "resource.inc"
-.include "ppu.asm"
 
 .segment "STARTUP"
 .proc Reset
