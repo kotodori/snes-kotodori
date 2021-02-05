@@ -4,8 +4,6 @@
 ;----------------------------------------------------------------------------
 .setcpu "65816"
 
-.include "common.inc"
-
 .import InitRegs
 .import printControllerInputs
 .import readControllerInputs
@@ -15,8 +13,8 @@ Palette:
   .incbin "palette.bin"
 Pattern:
   .incbin "tile.bin"
-String:
-  .asciiz "HELLO, WORLD!"
+
+.include "resource.inc"
 
 .segment "STARTUP"
 .proc Reset
@@ -36,6 +34,7 @@ String:
 
   sep #$20
 .a8
+
   lda #$40
   sta $2107
   stz $210b
@@ -65,79 +64,9 @@ copypal:
   dey
   bne copypal
   plb
-
-; Copy Patterns
-  lda #$00
-  pha
   plb
 
-  rep #$20
-.a16
-  lda #$0000
-  sta $2116
-  ldy #$2000
-  ldx #$0000
-
-  lda #$00
-  pha
-
-copyptn:
-  lda #^Pattern
-  pha
-  plb
-
-  lda Pattern, x
-
-  plb
-  plb
-  plb
-
-  sta $2118
-
-  lda #$00
-  pha
-
-  inx
-  inx
-  dey
-  bne copyptn
-  plb
-
-
-; Copy NameTable
-  lda #$00
-  pha
-
-  lda #$41a9
-  sta $2116
-  ldy #$000d
-  ldx #$0000
-  lda #$0000
-copyname:
-  sep #$20
-.a8
-  lda #^String
-  pha
-  plb
-
-  lda String, x
-
-  plb
-
-  rep #$20
-.a16
-  sta $2118
-
-  lda #$00
-  pha
-  plb
-
-  inx
-  dey
-  bne copyname
-
-  plb
-
+  loadWithAssetAddress Pattern, #$0000, #$4000
 
   lda #$01
   sta $212c
