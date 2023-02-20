@@ -15,7 +15,7 @@ Pattern:
   .incbin "tile.bin"
 
 .include "resource.inc"
-.include "ppu/clearTileMap.asm"
+.include "ppu/clearBG1TileMap.asm"
 
 .segment "STARTUP"
 .proc Reset
@@ -25,7 +25,7 @@ Pattern:
   phk
   plb ; DB = 0
 
-  clearTileMap ; BG1 のタイルマップをクリアする
+  clearBG1TileMap ; BG1 のタイルマップをクリアする
 
   rep #$30 ; A,I 16bit
 .a16

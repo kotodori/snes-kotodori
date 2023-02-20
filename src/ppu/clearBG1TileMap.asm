@@ -1,7 +1,7 @@
 .include "../registers.inc"
 
-; BG1 の TileMap($4000 - $4400)を 0 で埋める。起動直後に呼ばれることを期待している。
-.macro clearTileMap
+; BG1 の TileMap(#$4000 - #$4400)を 0 で埋めてクリアする。起動直後に呼ばれることを期待している。
+.macro clearBG1TileMap
   rep #$30
 .a16
 .i16
