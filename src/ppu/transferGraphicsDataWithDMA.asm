@@ -1,7 +1,7 @@
 .setcpu "65816"
 
-.include "registers.inc"
-.include "common.inc"
+.include "../registers.inc"
+.include "../common/function.inc"
 
 .segment "STARTUP"
 
