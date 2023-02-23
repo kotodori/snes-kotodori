@@ -1,8 +1,8 @@
 CL65 = cl65
 LD65 = ld65
 
-ROM_NAME := snes_kotodori.smc
-CONFIG := snes_kotodori.cfg
+ROM_NAME := kotodori.smc
+CONFIG := kotodori.cfg
 SOURCE_DIR := src
 OUT_DIR := build
 

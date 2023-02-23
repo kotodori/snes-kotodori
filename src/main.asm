@@ -10,11 +10,11 @@
 
 .segment "RODATA"
 Palette:
-  .incbin "palette.bin"
+  .incbin "../assets/palette.bin"
 Pattern:
-  .incbin "tile.bin"
+  .incbin "../assets/tile.bin"
 
-.include "resource.inc"
+.include "ppu/loadWithAssetAddress.inc"
 .include "ppu/clearBG1TileMap.asm"
 
 .segment "STARTUP"
