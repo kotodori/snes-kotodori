@@ -11,11 +11,12 @@
 .segment "RODATA"
 Palette:
   .incbin "../assets/palette.bin"
-Pattern:
-  .incbin "../assets/tile.bin"
+Font:
+  .incbin "../assets/font.bin"
 
 .include "ppu/loadWithAssetAddress.inc"
 .include "ppu/clearBG1TileMap.asm"
+.include "ppu/transfer16x16Font.inc"
 
 .segment "STARTUP"
 .proc Reset
@@ -70,7 +71,7 @@ copypal:
   plb
   plb
 
-  loadWithAssetAddress Pattern, #$0000, #$4000
+  transfer16x16Font
 
   lda #$01
   sta $212c

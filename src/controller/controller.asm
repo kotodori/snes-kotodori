@@ -56,8 +56,8 @@ function printControllerInputs
   pha
   pld
 
-  renderWord buffer1, #$41a9
-  renderWord buffer2, #$41e9
+  renderWord buffer1, #$41a9 ; 画面上下中央、少し左の位置
+  renderWord buffer2, #$41e9 ; ↑ の一段下の位置
 
   pld
 endFunction
