@@ -8,7 +8,7 @@
 .a16
 .i16
 
-  lda tileAddress ; タイルの位置？
+  lda tileAddress ; タイルの位置
   sta rVRamAddress
 
   sep #$30
@@ -17,6 +17,10 @@
 
   ldx #$00 ; 上半分の伝送をするので 0x00
   ldy #$10 ; 転送する量
+
+  lda #$00 ; DRAM 書き込み用のバンク $00 をここで指定しておく
+  pha
+  plb
 
 transferUpperBlock:
   lda #^Font
@@ -51,6 +55,10 @@ transferUpperBlock:
 
   ldx #$10 ; 下半分の伝送をするので 0x10
   ldy #$10 ; 転送する量
+
+  lda #$00 ; DRAM 書き込み用のバンク $00 をここで指定しておく
+  pha
+  plb
 
 transferLowerBlock:
   lda #^Font
