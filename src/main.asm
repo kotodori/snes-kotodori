@@ -71,7 +71,7 @@ copypal:
   plb
   plb
 
-  transfer16x16Font
+  transfer16x16Font #$0000, $0000
 
   lda #$01
   sta $212c

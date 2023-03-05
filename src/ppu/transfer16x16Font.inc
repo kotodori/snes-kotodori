@@ -1,4 +1,4 @@
-.macro transfer16x16Font
+.macro transfer16x16Font tileAddress, fontOffset
   phb
   phx
   phy
@@ -8,22 +8,22 @@
 .a16
 .i16
 
-  lda #$0000
+  lda tileAddress ; タイルの位置？
   sta rVRamAddress
 
   sep #$30
 .a8
 .i8
 
-  ldx #$10
-  ldy #$10
+  ldx #$00 ; 上半分の伝送をするので 0x00
+  ldy #$10 ; 転送する量
 
 transferUpperBlock:
   lda #^Font
   pha
   plb
 
-  lda Font, x
+  lda Font + fontOffset, x
 
   plb
 
@@ -42,22 +42,22 @@ transferUpperBlock:
 .a16
 .i16
 
-  lda #$0080
+  lda tileAddress + $0080 ; 下半分の 8x16 分の大きさのタイルは 0x0080 先
   sta rVRamAddress
 
   sep #$30
 .a8
 .i8
 
-  ldx #$00
-  ldy #$10
+  ldx #$10 ; 下半分の伝送をするので 0x10
+  ldy #$10 ; 転送する量
 
 transferLowerBlock:
   lda #^Font
   pha
   plb
 
-  lda Font, x
+  lda Font + fontOffset, x
 
   plb
 
