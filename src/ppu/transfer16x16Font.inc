@@ -11,6 +11,7 @@
   lda tileAddress ; タイルの位置
   sta rVRamAddress
 
+  ; TODO: 16 bit のほうが手間が減りそうか考える
   sep #$30
 .a8
 .i8
@@ -33,7 +34,8 @@ transferUpperBlock:
 
   sta rVRamDataWrite
 
-  lda #$00
+  lda #$00 ; 2 bpp なので、残りのパレット分を埋める
+
   sta rVRamDataWrite + 1
 
   pha
@@ -71,7 +73,7 @@ transferLowerBlock:
 
   sta rVRamDataWrite
 
-  lda #$00
+  lda #$00 ; 2 bpp なので、残りのパレット分を埋める
   sta rVRamDataWrite + 1
 
   pha
