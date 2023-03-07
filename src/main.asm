@@ -14,8 +14,10 @@ Palette:
 Font:
   .incbin "../assets/font.bin"
 
+.include "./registers.inc"
 .include "ppu/loadWithAssetAddress.inc"
 .include "ppu/clearBG1TileMap.asm"
+.include "ppu/fontDisplayTileMap.asm"
 .include "ppu/transfer16x16Font.inc"
 
 .segment "STARTUP"
@@ -26,7 +28,8 @@ Font:
   phk
   plb ; DB = 0
 
-  clearBG1TileMap ; BG1 のタイルマップをクリアする
+  ; clearBG1TileMap ; BG1 のタイルマップをクリアする
+  fontDisplayTileMap ; BG1 にフォントを並べて表示する
 
   rep #$30 ; A,I 16bit
 .a16
@@ -101,8 +104,8 @@ mainloop:
   phx
   php
 
-  jsr printControllerInputs
-  jsr readControllerInputs
+  ; jsr printControllerInputs
+  ; jsr readControllerInputs
 
   plp
   plx
