@@ -22,11 +22,11 @@ plb
 .a8
 
 transferLoop:
-  lda #^Font
+  lda #^FontBody
   pha
   plb
 
-  lda Font + fontOffset, x
+  lda FontBody + fontOffset, x
 
   plb
 

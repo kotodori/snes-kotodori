@@ -11,8 +11,12 @@
 .segment "RODATA"
 Palette:
   .incbin "../assets/palette.bin"
-Font:
-  .incbin "../assets/font.bin"
+FontHeader:
+  .incbin "../assets/fontHeader.bin"
+FontBody:
+  .incbin "../assets/fontBody.bin"
+Text:
+  .incbin "../assets/test.txt"
 
 .include "./registers.inc"
 .include "ppu/loadWithAssetAddress.inc"
