@@ -25,7 +25,7 @@ loop:
   pha
   txa
   clc
-  adc #$0020
+  adc #$0020 ; 16×16 の下半分の描画に移る
   tax
   pla
 
@@ -52,7 +52,6 @@ skip:
   pla
 
   stx rVRamAddress ; 演算終了した X レジスタの内容をセット
-
 
   dey
 
