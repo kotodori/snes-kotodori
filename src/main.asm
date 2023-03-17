@@ -49,7 +49,6 @@ Text:
 
   lda #$40
   sta $2107
-  stz $210b
 
 ; Copy Palettes
   phb
