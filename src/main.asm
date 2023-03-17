@@ -16,13 +16,14 @@ FontHeader:
 FontBody:
   .incbin "../assets/fontBody.bin"
 Text:
-  .incbin "../assets/test.txt"
+  .incbin "../assets/test-utf-16le.txt"
 
 .include "./registers.inc"
 .include "ppu/loadWithAssetAddress.inc"
 .include "ppu/clearBG1TileMap.asm"
 .include "ppu/fontDisplayTileMap.asm"
 .include "ppu/transfer16x16Font.inc"
+.include "text/transferText.asm"
 
 .segment "STARTUP"
 .proc Reset
@@ -33,7 +34,8 @@ Text:
   plb ; DB = 0
 
   ; clearBG1TileMap ; BG1 のタイルマップをクリアする
-  fontDisplayTileMap ; BG1 にフォントを並べて表示する
+  ; fontDisplayTileMap ; BG1 にフォントを並べて表示する
+  transferText ; テキストの転送
 
   rep #$30 ; A,I 16bit
 .a16
