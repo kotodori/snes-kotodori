@@ -1,7 +1,7 @@
 .setcpu "65816"
 
-.define characterDataBank $0100
-.define utf16Word $0102
+.define utf16Word $0100
+.define characterDataBank $0102
 
 ; BG1 の TileMap(#$4000 - #$4400)上に、UTF-16 テキストの内容を並べる
 .macro transferText
@@ -10,7 +10,6 @@
 
   lda #$00
   sta characterDataBank
-  sta characterDataBank + 1
   pha
 
   lda #^Text
@@ -21,7 +20,7 @@
 .a16
 .i16
 
-  lda Text + 2
+  lda Text + 2 ; 0 文字目が BOM なので 1 文字目から読む
 
   plb
 
@@ -53,24 +52,12 @@
   rep #$20
 .a16
 
-  ldx utf16Word
-
-  sep #$20
-.a8
-
-  pha
-  plb ; 計算済みの characterDataBank が DB レジスタにセットされる
-
-  rep #$20
-.a16
-
   lda #utf16Word 
   tad
 
   ; Direct Page レジスタにインデックスを指し示す 16 bit アドレスが入っている
   ; DB レジスタに Bank がセットされているので、そこから 16 bit 読み込む
-  ; TODO: Direct Page Indirect Long Indexed にする(メモリから一気に 24 bit アドレスを読み込みたい)
-  lda ($00)
+  lda [$00]
 
   ; Glyph が存在するか
   ; TODO: 後で実装
@@ -79,7 +66,7 @@
   lda #$0002
   tay
 
-  lda($00), y
+  lda[$00], y
 
   ; Index * 32(5 Lsh)して、Glyph のデータを取得する
 
