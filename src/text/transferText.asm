@@ -1,3 +1,5 @@
+.setcpu "65816"
+
 .define characterDataBank $0100
 .define utf16Word $0102
 
@@ -32,20 +34,54 @@
   asl utf16Word
   rol characterDataBank
 
-  ; アドレスセットする
-  ldx utf16Word
-
   sep #$20
 .a8
-  lda characterDataBank
-  pha
-  plb
+
+  clc
+  lda #<FontHeader
+  adc utf16Word
+  sta utf16Word
+
+  lda #>FontHeader
+  adc utf16Word + 1
+  sta utf16Word + 1
+
+  lda #^FontHeader
+  adc characterDataBank
+  sta characterDataBank
 
   rep #$20
 .a16
 
-  ; インデックスにアクセス
-  lda FontHeader, x
+  ldx utf16Word
+
+  sep #$20
+.a8
+
+  pha
+  plb ; 計算済みの characterDataBank が DB レジスタにセットされる
+
+  rep #$20
+.a16
+
+  lda #utf16Word 
+  tad
+
+  ; Direct Page レジスタにインデックスを指し示す 16 bit アドレスが入っている
+  ; DB レジスタに Bank がセットされているので、そこから 16 bit 読み込む
+  ; TODO: Direct Page Indirect Long Indexed にする(メモリから一気に 24 bit アドレスを読み込みたい)
+  lda ($00)
+
+  ; Glyph が存在するか
+  ; TODO: 後で実装
+
+  ; Glyph が存在するので、Glyph の Index を取得する
+  lda #$0002
+  tay
+
+  lda($00), y
+
+  ; Index * 32(5 Lsh)して、Glyph のデータを取得する
 
   ; ここからタイルマップの転送
 
@@ -55,7 +91,7 @@
   ldy #$0100
 
   lda #$0000
-loop:
+@loop:
   sta rVRamDataWrite
   inc a
 
@@ -83,10 +119,10 @@ loop:
   sbc #$001e
 
   bit #$001f ; 32 で割り切れる(1行描画が終了している)場合は、スキップ
-  bne skip
+  bne @skip
   clc
   adc #$0020 ; 1行分下に移動させる
-skip:
+@skip:
 
   tax
   pla
@@ -95,5 +131,5 @@ skip:
 
   dey
 
-  bne loop
+  bne @loop
 .endmacro
