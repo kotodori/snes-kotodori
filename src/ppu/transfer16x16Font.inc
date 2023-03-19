@@ -5,8 +5,8 @@
   pha
 
   lda #$00 ; DRAM 書き込み用のバンク $00 をここで指定しておく
-pha
-plb
+  pha
+  plb
 
   rep #$30
 .a16
