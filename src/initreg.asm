@@ -102,6 +102,9 @@
     lda #$01
     sta $420d
 
+    rep #$20 ; A 16bit
+.a16
+
     rts
 .endproc
 

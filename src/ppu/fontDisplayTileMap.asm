@@ -1,9 +1,5 @@
 ; BG1 の TileMap(#$4000 - #$4400)を 16×16 フォント表示用の配列に並び替える
 .macro fontDisplayTileMap
-  rep #$30
-.a16
-.i16
-
   lda #$0000 ; DB レジスタセット
   pha
   plb

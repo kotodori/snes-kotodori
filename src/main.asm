@@ -10,6 +10,12 @@
 .import transferCharacter
 .import textWritePosition
 
+.include "./registers.inc"
+.include "ppu/loadWithAssetAddress.inc"
+.include "ppu/clearBG1Tile.asm"
+.include "ppu/fontDisplayTileMap.asm"
+.include "ppu/transfer16x16Font.inc"
+
 .segment "RODATA"
 Palette:
   .incbin "../assets/palette.bin"
@@ -21,42 +27,38 @@ Text:
   .incbin "../assets/test-utf-16le.txt"
 .export FontHeader, FontBody, Text
 
-.include "./registers.inc"
-.include "ppu/loadWithAssetAddress.inc"
-.include "ppu/clearBG1Tile.asm"
-.include "ppu/fontDisplayTileMap.asm"
-.include "ppu/transfer16x16Font.inc"
-
 .segment "STARTUP"
 .proc Reset
-  sei
+  sei ; Set Interrupt flag
+
   clc
   xce ; Native Mode
+
   phk
   plb ; DB = 0
 
-  clearBG1Tile ; BG1 のタイルマップをクリアする
-  fontDisplayTileMap ; BG1 にフォントを並べて表示する
+  jsr InitRegs
 
   rep #$30 ; A,I 16bit
 .a16
 .i16
 
+  clearBG1Tile ; BG1 のタイルマップをクリアする
+  fontDisplayTileMap ; BG1 にフォントを並べて表示する
+
   ldx #$1fff ; Stack pointer value set
   txs
-
-  jsr InitRegs
 
   sep #$20
 .a8
 
   lda #$40
-  sta $2107
+  sta $2107 ; BG 1 Address and Size
 
 ; Copy Palettes
   phb
 
-  stz $2121
+  stz $2121 ; Address for CG-RAM Write
   ldy #$0200
   ldx #$0000
 
@@ -70,7 +72,7 @@ copypal:
 
   lda Palette, x
   plb
-  sta $2122
+  sta $2122 ; Data for CG-RAM Write
   lda #$00
   pha
 
@@ -86,7 +88,7 @@ copypal:
 
   lda #$0000
   sta $0104 ; textWritePosition
-  
+
   ldx #$0002
 @transferTextLoop:
   jsr transferCharacter ; テキストの転送
@@ -96,17 +98,17 @@ copypal:
   bne @transferTextLoop
 
   lda #$01
-  sta $212c
-  stz $212d
+  sta $212c ; Background and Object Enable (Main Screen)
+  stz $212d ; Background and Object Enable (Sub Screen)
   lda #$0f
-  sta $2100
+  sta $2100 ; Screen Display Register
 
   sep #$20
 .a8
 
   ; Enable NMI
   lda #$80
-  sta $4200
+  sta $4200 ; NMI, V/H Count, and Joypad Enable
 
   rep #$20
 .a16
@@ -139,15 +141,15 @@ mainloop:
 .segment "TITLE"
   .byte "KOTODORI             " ; Game Title
 .segment "HEADER"
-  .byte $31                     ; 0x01:HiRom, 0x30:FastRom(3.57MHz)
-  .byte $00                     ; ROM only
-  .byte $0c                     ; 32KB=256KBits
-  .byte $00                     ; RAM Size (8KByte * N)
-  .byte $00                     ; NTSC
-  .byte $01                     ; Licensee
-  .byte $00                     ; Version
-  .word $CDCD
-  .word $3232
+  .byte $31                     ; ROM Type
+  .byte $00                     ; Cartidge Type: ROM only
+  .byte $0c                     ; ROM Size: 17 ~ 32MBit
+  .byte $00                     ; RAM Size: No RAM
+  .byte $00                     ; Destination Code: Japan
+  .byte $33                     ; Fixed Value: 33H
+  .byte $00                     ; Mask ROM Version
+  .word $0000                   ; Complement Check
+  .word $ffff                   ; Checksum
   .byte $ff, $ff, $ff, $ff      ; unknown
 
   .word .loword(EmptyInt)       ; Native:COP
