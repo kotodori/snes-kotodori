@@ -7,6 +7,8 @@
 .import InitRegs
 .import printControllerInputs
 .import readControllerInputs
+.import transferCharacter
+.import textWritePosition
 
 .segment "RODATA"
 Palette:
@@ -17,13 +19,13 @@ FontBody:
   .incbin "../assets/fontBody.bin"
 Text:
   .incbin "../assets/test-utf-16le.txt"
+.export FontHeader, FontBody, Text
 
 .include "./registers.inc"
 .include "ppu/loadWithAssetAddress.inc"
-.include "ppu/clearBG1TileMap.asm"
+.include "ppu/clearBG1Tile.asm"
 .include "ppu/fontDisplayTileMap.asm"
 .include "ppu/transfer16x16Font.inc"
-.include "text/transferText.asm"
 
 .segment "STARTUP"
 .proc Reset
@@ -33,15 +35,14 @@ Text:
   phk
   plb ; DB = 0
 
-  ; clearBG1TileMap ; BG1 のタイルマップをクリアする
-  ; fontDisplayTileMap ; BG1 にフォントを並べて表示する
-  transferText ; テキストの転送
+  clearBG1Tile ; BG1 のタイルマップをクリアする
+  fontDisplayTileMap ; BG1 にフォントを並べて表示する
 
   rep #$30 ; A,I 16bit
 .a16
 .i16
 
-  ldx #$1fff
+  ldx #$1fff ; Stack pointer value set
   txs
 
   jsr InitRegs
@@ -79,7 +80,20 @@ copypal:
   plb
   plb
 
-  transfer16x16Font #$0000, $0000
+  rep #$30 ; A,I 16bit
+.a16
+.i16
+
+  lda #$0000
+  sta $0104 ; textWritePosition
+  
+  ldx #$0002
+@transferTextLoop:
+  jsr transferCharacter ; テキストの転送
+  inx
+  inx
+  cpx #$0200
+  bne @transferTextLoop
 
   lda #$01
   sta $212c
@@ -96,7 +110,6 @@ copypal:
 
   rep #$20
 .a16
-
 
 mainloop:
   jmp mainloop

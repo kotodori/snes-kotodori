@@ -6,7 +6,8 @@
 
 .define utf16Word $0100
 .define characterDataBank $0102
-.define characterMetaData $0104 ; 8 bytes
+.define textWritePosition $0104
+.define characterMetaData $0106 ; 8 bytes
   ; 0: 存在フラグなど
   ; 1: \
   ; 2: インデックス
@@ -16,6 +17,8 @@
   ; 6: 横送り量
   ; 7: 未使用
 
+.segment "STARTUP"
+
 ; BG1 の TileMap(#$4000 - #$4400)上に、UTF-16 テキストの内容を並べる
 .export transferCharacter
 .proc transferCharacter
@@ -23,9 +26,6 @@
 
   sep #$20
 .a8
-
-  lda #$00
-  pha
 
   lda #^Text
   pha
@@ -35,13 +35,29 @@
 .a16
 .i16
 
-  plx ; 呼び出し前にテキストポインタ(2 bytes)がスタックに保存されている想定
-  lda Text, x
-  phx
+  ldy Text, x
 
+  lda #$00
+  pha
+  plb
   plb
 
-  sta utf16Word
+  ; 文字が LF (U+000A)だったら？
+  cpy #$000a
+  bne @notLineFeed
+
+@lineFeed:
+  lda textWritePosition
+  and #$fff0 ; 下位1バイトをクリアして
+  clc
+  adc #$0010 ; 0x10 足す
+  sta textWritePosition
+  rts
+
+  ; LF じゃなかった
+@notLineFeed:
+
+  sty utf16Word
 
   asl utf16Word ; アドレスを 3 bits 左シフト
   rol characterDataBank
@@ -80,8 +96,8 @@
   ; TODO: 後で実装
 
   ; Glyph が存在するので、Glyph の Index を取得する
-  lda #$0002
-  tay ; 2 bytes 先に Index があるので、ずらす量を Y にセット
+  lda #$0002 ; 2 bytes 先に Index があるので、ずらす量を Y にセット
+  tay 
 
   lda[$00], y
 
@@ -128,10 +144,15 @@
   plb
 
   ; ここからタイルの転送
-  lda #$0000 ; VRAM の先頭
+  lda textWritePosition
+  asl
+  asl
+  asl
+  asl
+  asl
   sta rVRamAddress
+  inc textWritePosition
 
-  ldx #$0000
   ldy #$0000
 
   lda #utf16Word
