@@ -14,7 +14,6 @@
 .include "ppu/loadWithAssetAddress.inc"
 .include "ppu/clearBG1Tile.asm"
 .include "ppu/fontDisplayTileMap.asm"
-.include "ppu/transfer16x16Font.inc"
 
 .segment "RODATA"
 Palette:

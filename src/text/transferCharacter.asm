@@ -26,8 +26,7 @@
 
   ldy Text, x
 
-  lda #$0000
-  pha
+  pea $0000
   plb
   plb
 
@@ -77,8 +76,7 @@
 @glyphNotExist: ; Glyph が存在しない場合
   ldy #$3000 ; 全角スペース "　" のコードポイント
 
-  lda #$0000
-  pha
+  pea $0000
   plb
   plb
 
@@ -117,8 +115,7 @@
   adc characterDataBank
   sta characterDataBank
 
-  lda #$0000
-  pha
+  pea $0000
   plb
   plb
 
