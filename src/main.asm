@@ -113,9 +113,6 @@ copypal:
   rep #$20
 .a16
 
-mainloop:
-  jmp mainloop
-
   rti
 .endproc
 

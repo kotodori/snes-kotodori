@@ -7,23 +7,12 @@
 .define utf16Word $0100
 .define characterDataBank $0102
 .define textWritePosition $0104
-.define characterMetaData $0106 ; 8 bytes
-  ; 0: 存在フラグなど
-  ; 1: \
-  ; 2: インデックス
-  ; 3: /
-  ; 4: 横幅
-  ; 5: 縦幅
-  ; 6: 横送り量
-  ; 7: 未使用
 
 .segment "STARTUP"
 
 ; BG1 の TileMap(#$4000 - #$4400)上に、UTF-16 テキストの内容を並べる
 .export transferCharacter
 .proc transferCharacter
-  stz characterDataBank
-
   sep #$20
 .a8
 
@@ -37,27 +26,27 @@
 
   ldy Text, x
 
-  lda #$00
+  lda #$0000
   pha
   plb
   plb
 
-  ; 文字が LF (U+000A)だったら？
+  ; 文字が LF (U+000A)かどうか
   cpy #$000a
   bne @notLineFeed
 
-@lineFeed:
+@lineFeed: ; LF だった場合
   lda textWritePosition
-  and #$fff0 ; 下位1バイトをクリアして
+  and #$fff0 ; 下位 4 bits だけををクリアして
   clc
   adc #$0010 ; 0x10 足す
-  sta textWritePosition
+  sta textWritePosition ; 次の行の先頭に描画位置を移動する
   rts
 
-  ; LF じゃなかった
-@notLineFeed:
-
+@calculateGlyphAddress:
+@notLineFeed: ; LF でない場合
   sty utf16Word
+  stz characterDataBank
 
   asl utf16Word ; アドレスを 3 bits 左シフト
   rol characterDataBank
@@ -66,43 +55,43 @@
   asl utf16Word
   rol characterDataBank
 
-  sep #$20
-.a8
-
   clc
-  lda #<FontHeader
+  lda #.LOWORD(FontHeader)
   adc utf16Word
   sta utf16Word
 
-  lda #>FontHeader
-  adc utf16Word + 1
-  sta utf16Word + 1
-
-  lda #^FontHeader
+  lda #.HIWORD(FontHeader)
   adc characterDataBank
   sta characterDataBank
 
-  rep #$20
-.a16
-
-  lda #utf16Word 
+  lda #utf16Word
   tcd
 
   ; Direct Page レジスタにインデックスを指し示す 16 bit アドレスが入っている
   ; DB レジスタに Bank がセットされているので、そこから 16 bit 読み込む
   lda [$00]
 
-  ; Glyph が存在するか
-  ; TODO: 後で実装
+  and #$0001 ; Glyph が存在するか
+  bne @glyphExists
 
+@glyphNotExist: ; Glyph が存在しない場合
+  ldy #$3000 ; 全角スペース "　" のコードポイント
+
+  lda #$0000
+  pha
+  plb
+  plb
+
+  jmp @calculateGlyphAddress
+
+@glyphExists: ; Glyph が存在する場合
   ; Glyph が存在するので、Glyph の Index を取得する
-  lda #$0002 ; 2 bytes 先に Index があるので、ずらす量を Y にセット
-  tay 
+  lda #$0002 ; Index があるので、offset 量を Y にセット
+  tay
 
   lda[$00], y
 
-  ; Glyph の Index 番号のデータが Big Endian なので、バイトの上位下位を反転
-  xba
+  xba ; Glyph の Index 番号のデータが Big Endian なので、バイトの上位下位を反転
 
   ; Index * 32(5 Lsh)して、Glyph のデータを取得する
   sta utf16Word
@@ -119,24 +108,14 @@
   asl utf16Word
   rol characterDataBank
 
-  sep #$20
-.a8
-
   clc
-  lda #<FontBody
+  lda #.LOWORD(FontBody)
   adc utf16Word
   sta utf16Word
 
-  lda #>FontBody
-  adc utf16Word + 1
-  sta utf16Word + 1
-
-  lda #^FontBody
+  lda #.HIWORD(FontBody)
   adc characterDataBank
   sta characterDataBank
-
-  rep #$20
-.a16
 
   lda #$0000
   pha
@@ -145,7 +124,7 @@
 
   ; ここからタイルの転送
   lda textWritePosition
-  asl
+  asl ; 5 bits 左シフトで VRAM Address に変換する
   asl
   asl
   asl
