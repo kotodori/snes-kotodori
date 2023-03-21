@@ -7,7 +7,7 @@
 .import InitRegs
 .import printControllerInputs
 .import readControllerInputs
-.import transferCharacter
+.import transferText
 .import textWritePosition
 
 .include "./registers.inc"
@@ -16,6 +16,7 @@
 .include "ppu/fontDisplayTileMap.asm"
 
 .segment "RODATA"
+.export FontHeader, FontBody, Text
 Palette:
   .incbin "../assets/palette.bin"
 FontHeader:
@@ -24,12 +25,9 @@ FontBody:
   .incbin "../assets/fontBody.bin"
 Text:
   .incbin "../assets/test-utf-16le.txt"
-.export FontHeader, FontBody, Text
 
 .segment "STARTUP"
 .proc Reset
-  sei ; Set Interrupt flag
-
   clc
   xce ; Native Mode
 
@@ -85,25 +83,20 @@ copypal:
 .a16
 .i16
 
-  lda #$0000
-  sta $0104 ; textWritePosition
+  jsr transferText ; テキストの転送
 
-  ldx #$0002
-@transferTextLoop:
-  jsr transferCharacter ; テキストの転送
-  inx
-  inx
-  cpx #$0200
-  bne @transferTextLoop
+  sep #$20
+.a8
+
+  lda #$00
+  pha
+  plb
 
   lda #$01
   sta $212c ; Background and Object Enable (Main Screen)
   stz $212d ; Background and Object Enable (Sub Screen)
   lda #$0f
   sta $2100 ; Screen Display Register
-
-  sep #$20
-.a8
 
   ; Enable NMI
   lda #$80
