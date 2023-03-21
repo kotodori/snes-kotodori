@@ -7,46 +7,55 @@
 .import InitRegs
 .import printControllerInputs
 .import readControllerInputs
+.import transferText
+.import textWritePosition
+
+.include "./registers.inc"
+.include "ppu/loadWithAssetAddress.inc"
+.include "ppu/clearBG1Tile.asm"
+.include "ppu/fontDisplayTileMap.asm"
 
 .segment "RODATA"
+.export FontHeader, FontBody, Text
 Palette:
   .incbin "../assets/palette.bin"
-Pattern:
-  .incbin "../assets/tile.bin"
-
-.include "ppu/loadWithAssetAddress.inc"
-.include "ppu/clearBG1TileMap.asm"
+FontHeader:
+  .incbin "../assets/fontHeader.bin"
+FontBody:
+  .incbin "../assets/fontBody.bin"
+Text:
+  .incbin "../assets/test-utf-16le.txt"
 
 .segment "STARTUP"
 .proc Reset
-  sei
   clc
   xce ; Native Mode
+
   phk
   plb ; DB = 0
 
-  clearBG1TileMap ; BG1 のタイルマップをクリアする
+  jsr InitRegs
 
   rep #$30 ; A,I 16bit
 .a16
 .i16
 
-  ldx #$1fff
-  txs
+  clearBG1Tile ; BG1 のタイルマップをクリアする
+  fontDisplayTileMap ; BG1 にフォントを並べて表示する
 
-  jsr InitRegs
+  ldx #$1fff ; Stack pointer value set
+  txs
 
   sep #$20
 .a8
 
   lda #$40
-  sta $2107
-  stz $210b
+  sta $2107 ; BG 1 Address and Size
 
 ; Copy Palettes
   phb
 
-  stz $2121
+  stz $2121 ; Address for CG-RAM Write
   ldy #$0200
   ldx #$0000
 
@@ -60,7 +69,7 @@ copypal:
 
   lda Palette, x
   plb
-  sta $2122
+  sta $2122 ; Data for CG-RAM Write
   lda #$00
   pha
 
@@ -70,27 +79,31 @@ copypal:
   plb
   plb
 
-  loadWithAssetAddress Pattern, #$0000, #$4000
+  rep #$30 ; A,I 16bit
+.a16
+.i16
 
-  lda #$01
-  sta $212c
-  stz $212d
-  lda #$0f
-  sta $2100
+  jsr transferText ; テキストの転送
 
   sep #$20
 .a8
 
+  lda #$00
+  pha
+  plb
+
+  lda #$01
+  sta $212c ; Background and Object Enable (Main Screen)
+  stz $212d ; Background and Object Enable (Sub Screen)
+  lda #$0f
+  sta $2100 ; Screen Display Register
+
   ; Enable NMI
   lda #$80
-  sta $4200
+  sta $4200 ; NMI, V/H Count, and Joypad Enable
 
   rep #$20
 .a16
-
-
-mainloop:
-  jmp mainloop
 
   rti
 .endproc
@@ -100,8 +113,8 @@ mainloop:
   phx
   php
 
-  jsr printControllerInputs
-  jsr readControllerInputs
+  ; jsr printControllerInputs
+  ; jsr readControllerInputs
 
   plp
   plx
@@ -117,15 +130,15 @@ mainloop:
 .segment "TITLE"
   .byte "KOTODORI             " ; Game Title
 .segment "HEADER"
-  .byte $31                     ; 0x01:HiRom, 0x30:FastRom(3.57MHz)
-  .byte $00                     ; ROM only
-  .byte $0c                     ; 32KB=256KBits
-  .byte $00                     ; RAM Size (8KByte * N)
-  .byte $00                     ; NTSC
-  .byte $01                     ; Licensee
-  .byte $00                     ; Version
-  .word $CDCD
-  .word $3232
+  .byte $31                     ; ROM Type
+  .byte $00                     ; Cartidge Type: ROM only
+  .byte $0c                     ; ROM Size: 17 ~ 32MBit
+  .byte $00                     ; RAM Size: No RAM
+  .byte $00                     ; Destination Code: Japan
+  .byte $33                     ; Fixed Value: 33H
+  .byte $00                     ; Mask ROM Version
+  .word $0000                   ; Complement Check
+  .word $ffff                   ; Checksum
   .byte $ff, $ff, $ff, $ff      ; unknown
 
   .word .loword(EmptyInt)       ; Native:COP

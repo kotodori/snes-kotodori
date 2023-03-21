@@ -18,7 +18,8 @@
     jsr transferGraphicsDataWithDMA
 
     tsc
-    adc #$0007
+    clc
+    adc #$0008
     tcs
   plx
 .endmacro
