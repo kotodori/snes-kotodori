@@ -14,11 +14,11 @@ OBJECTS := $(addprefix $(OUT_DIR)/,$(patsubst %.asm,%.o,$(SOURCES)))
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
-	$(LD65) -o $@ --config $(CONFIG) --obj $^
+	$(LD65) --dbgfile build/kotodori.dbg -o $@ --config $(CONFIG) --obj $^
 
 $(OUT_DIR)/%.o: %.asm
 	@if [ ! -e `dirname $@` ]; then mkdir -p `dirname $@`; fi
-	$(CL65) -t none -o $@ -c $<
+	$(CL65) -g -t none -o $@ -c $<
 
 clean:
 	rm -rf $(OUT_DIR)
