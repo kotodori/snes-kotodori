@@ -9,6 +9,7 @@
 .import readControllerInputs
 .import transferText
 .import textWritePosition
+.import copyPalettes
 
 .include "./registers.inc"
 .include "ppu/loadWithAssetAddress.inc"
@@ -17,8 +18,6 @@
 
 .segment "RODATA"
 .export FontHeader, FontBody, Text
-Palette:
-  .incbin "../assets/palette.bin"
 FontHeader:
   .incbin "../assets/fontHeader.bin"
 FontBody:
@@ -46,42 +45,7 @@ Text:
   ldx #$1fff ; Stack pointer value set
   txs
 
-  sep #$20
-.a8
-
-  lda #$40
-  sta $2107 ; BG 1 Address and Size
-
-; Copy Palettes
-  phb
-
-  stz $2121 ; Address for CG-RAM Write
-  ldy #$0200
-  ldx #$0000
-
-  lda #$00
-  pha
-
-copypal:
-  lda #^Palette
-  pha
-  plb
-
-  lda Palette, x
-  plb
-  sta $2122 ; Data for CG-RAM Write
-  lda #$00
-  pha
-
-  inx
-  dey
-  bne copypal
-  plb
-  plb
-
-  rep #$30 ; A,I 16bit
-.a16
-.i16
+  jsr copyPalettes ; Palette のコピー
 
   jsr transferText ; テキストの転送
 
@@ -92,9 +56,13 @@ copypal:
   pha
   plb
 
+  lda #$40
+  sta $2107 ; BG 1 Address and Size
+
   lda #$01
   sta $212c ; Background and Object Enable (Main Screen)
   stz $212d ; Background and Object Enable (Sub Screen)
+
   lda #$0f
   sta $2100 ; Screen Display Register
 
