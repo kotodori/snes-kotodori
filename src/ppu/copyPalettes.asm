@@ -19,11 +19,12 @@ Palette:
   .a8
 
   stz $00 ; $2121: Address for CG-RAM Write
-  ldx #$0000
 
   lda #^Palette
   pha
   plb
+
+  ldx #$0000
 
   @loop:
     lda Palette, x
