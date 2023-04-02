@@ -6,6 +6,8 @@
 
 .define utf16Word $0100
 .define characterDataBank $0102
+.define tempArea $0104
+.define tempCharacterSetArea $0110
 
 .segment "STARTUP"
 
@@ -95,13 +97,7 @@
     ; ここからタイルの転送
     lda $05, s
     asl ; 5 bits 左シフトで VRAM Address に変換する
-    asl
-    asl
-    asl
-    asl
     sta rVRamAddress
-
-    ldy #$0000
 
     lda #utf16Word
     tcd
@@ -109,15 +105,41 @@
     sep #$20
     .a8
 
-    @loop:
-      ; Direct Page レジスタが指し示す先に、Glyph データの先頭を指し示す 16 bit アドレスが入っている
+    ldy #$00 ; Counter
+    @loopABlock:
+      ; tempArea 4bytes
+      ; 00_00_00_00
+      ; A  B  C  D
+
+      ; Get glyph data & place to tempArea
       lda [$00], y
-      sta rVRamDataWrite
-      stz rVRamDataWrite + 1
+      sta tempArea
+      iny
+
+      lda [$00], y
+      sta tempArea + 1
+      iny
+
+      stz tempArea + 2
+      stz tempArea + 3
+
+      dey
+      dey
+
+      ; TODO: ここで良しなにビットシフト(3 bytes まるごと)
+
+      ; Write to temp character area
+      lda #$FF
+      sta tempCharacterSetArea, y
+
+      lda #$FF
+      sta tempCharacterSetArea + 8, y
 
       iny
-      cpy #$0020
-      bne @loop
+      iny
+
+      cpy #$04
+      bne @loopABlock
 
   rep #$20
   .a16

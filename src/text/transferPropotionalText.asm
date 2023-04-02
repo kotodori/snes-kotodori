@@ -9,7 +9,7 @@
   .a16
   .i16
 
-  ; テキストを描画する位置
+  ; テキストを描画する位置(px)
   pea $0000
 
   ; UTF-16LE テキスト先頭からの offset 量(bytes)
@@ -35,9 +35,9 @@
 
     @lineFeed: ; LF の場合
       lda $01, s
-      and #$fff0 ; 下位 4 bits だけをクリアして
+      and #$ff00 ; 下位 4 bits だけをクリアして
       clc
-      adc #$0010 ; 0x10 足す
+      adc #$0100 ; 0x20 足す
       sta $01, s ; 次の行の先頭に描画位置を移動する
       jmp @characterTransferEnd
 
@@ -47,13 +47,15 @@
       pla
 
       lda $01, s
-      inc
+      clc
+      adc #$0c
       sta $01, s
 
   @characterTransferEnd:
     inx
     inx
-    jmp @loop
+    cpx #$0004 ; 1文字読み込んだら終わり(最初に BOM が 2 bytes あることに注意)
+    bne @loop
 
   @textTransferEnd:
 
