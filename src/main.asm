@@ -7,7 +7,7 @@
 .import InitRegs
 .import printControllerInputs
 .import readControllerInputs
-.import transferText
+.import transferPropotionalText
 .import textWritePosition
 .import copyPalettes
 
@@ -47,7 +47,7 @@ Text:
 
   jsr copyPalettes ; Palette のコピー
 
-  jsr transferText ; テキストの転送
+  jsr transferPropotionalText; テキストの転送
 
   sep #$20
 .a8

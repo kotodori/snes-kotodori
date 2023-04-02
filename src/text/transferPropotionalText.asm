@@ -1,6 +1,6 @@
 .setcpu "65816"
 
-.import Text, transferCharacter
+.import Text, transferPropotionalCharacter
 
 .segment "STARTUP"
 
@@ -43,7 +43,7 @@
 
     @notLineFeed: ; LF でない場合
       pha ; Code point を Stack に積む
-      jsr transferCharacter
+      jsr transferPropotionalCharacter
       pla
 
       lda $01, s
@@ -53,8 +53,7 @@
   @characterTransferEnd:
     inx
     inx
-    cpx #$0200 ; 0x0200 bytes(UTF-16 で 1 byte = 2 文字なので 256 文字)を上限とする
-    bne @loop
+    jmp @loop
 
   @textTransferEnd:
 
